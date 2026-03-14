@@ -1,0 +1,6 @@
+@StudioFlow_HostAddress = http://localhost:5028
+
+GET {{StudioFlow_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
