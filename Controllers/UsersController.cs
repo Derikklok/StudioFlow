@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudioFlow.DTOs.User;
-using StudioFlow.Exceptions;
 using StudioFlow.Services.Interfaces;
 
 namespace StudioFlow.Controllers;
@@ -24,7 +23,7 @@ public class UsersController : ControllerBase
             var user = await _service.CreateUser(dto);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
-        catch (DuplicateEmailException ex)
+        catch (InvalidOperationException ex)
         {
             return BadRequest(new { error = ex.Message });
         }

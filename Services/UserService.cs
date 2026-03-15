@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudioFlow.DTOs.User;
-using StudioFlow.Exceptions;
 using StudioFlow.Models;
 using StudioFlow.Repositories.Interfaces;
 using StudioFlow.Services.Interfaces;
@@ -19,15 +18,26 @@ public class UserService : IUserService
     // Create User
     public async Task<User> CreateUser(CreateUserDto dto)
     {
-        var user = new User
+        try
         {
-            Name = dto.Name,
-            Email = dto.Email,
-            Password = dto.Password,
-            Role = dto.Role
-        };
+            var user = new User
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                Password = dto.Password,
+                Role = dto.Role
+            };
 
-        return await _repository.CreateAsync(user);
+            return await _repository.CreateAsync(user);
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException?.Message.Contains("Duplicate") ?? false)
+            {
+                throw new InvalidOperationException("A user with this email address already exists.", ex);
+            }
+            throw;
+        }
     }
 
     // Get All Users

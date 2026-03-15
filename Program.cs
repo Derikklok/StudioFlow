@@ -20,6 +20,8 @@ builder.Services.AddControllers()
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -62,6 +64,20 @@ app.Use(async (context, next) =>
     {
         // Handle duplicate email silently - no console logging
         context.Response.StatusCode = 400;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+    }
+    catch (UserAlreadyExistsException ex)
+    {
+        // Handle user already exists silently - no console logging
+        context.Response.StatusCode = 400;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+    }
+    catch (InvalidCredentialsException ex)
+    {
+        // Handle invalid credentials silently - no console logging
+        context.Response.StatusCode = 401;
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsJsonAsync(new { error = ex.Message });
     }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudioFlow.Data;
-using StudioFlow.Exceptions;
 using StudioFlow.Models;
 using StudioFlow.Repositories.Interfaces;
 
@@ -25,10 +24,10 @@ public class UserRepository : IUserRepository
         }
         catch (DbUpdateException ex)
         {
-            // Check for unique constraint violation on Email
+            // Check for unique constraint violation
             if (ex.InnerException?.Message.Contains("Duplicate") ?? false)
             {
-                throw new DuplicateEmailException(user.Email);
+                throw new InvalidOperationException("A user with this email address already exists.");
             }
             throw;
         }
