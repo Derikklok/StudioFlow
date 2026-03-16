@@ -21,6 +21,8 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ISampleRepository, SampleRepository>();
+builder.Services.AddScoped<ISampleService, SampleService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -81,6 +83,16 @@ app.Use(async (context, next) =>
         await context.Response.WriteAsJsonAsync(new { error = ex.Message });
     }
     catch (ProjectNotFoundException ex)
+    {
+        context.Response.StatusCode = 404;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = ex.Message
+        });
+    }
+    catch (SampleNotFoundException ex)
     {
         context.Response.StatusCode = 404;
         context.Response.ContentType = "application/json";

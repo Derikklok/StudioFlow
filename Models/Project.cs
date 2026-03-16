@@ -25,4 +25,7 @@ public class Project
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAt { get; set; }
+
+    // Navigation property - one project can have many samples
+    public ICollection<Sample> Samples { get; set; } = new List<Sample>();
 }
