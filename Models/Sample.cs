@@ -24,4 +24,7 @@ public class Sample
 
     // Navigation property
     public Project Project { get; set; } = default!;
+
+    // nullable in the Sample class. It perfectly models reality: A sample exists first, and the clearance might not happen until weeks later.
+    public Clearance? Clearance { get; set; }
 }

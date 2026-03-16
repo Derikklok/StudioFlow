@@ -10,6 +10,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Project> Projects { get; set; }
 
     public DbSet<Sample> Samples { get; set; }
+    
+    public DbSet<Clearance> Clearances { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,6 +23,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany(p => p.Samples)
             .HasForeignKey(s => s.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Clearance>()
+            .HasOne(c => c.Sample)
+            .WithOne(s => s.Clearance)
+            .HasForeignKey<Clearance>(c => c.SampleId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Configure Email unique constraint for Users
         modelBuilder.Entity<User>()
@@ -28,3 +36,4 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .IsUnique();
     }
 }
+
