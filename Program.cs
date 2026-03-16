@@ -13,15 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -81,18 +80,28 @@ app.Use(async (context, next) =>
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsJsonAsync(new { error = ex.Message });
     }
+    catch (ProjectNotFoundException ex)
+    {
+        context.Response.StatusCode = 404;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = ex.Message
+        });
+    }
     catch (Exception ex)
     {
         // Log only unexpected errors with minimal info
         var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
         logger.LogError("Unexpected error occurred: {Message}", ex.Message);
-        
+
         context.Response.StatusCode = 500;
         context.Response.ContentType = "application/json";
-        await context.Response.WriteAsJsonAsync(new 
-        { 
+        await context.Response.WriteAsJsonAsync(new
+        {
             error = "An unexpected error occurred. Please try again later.",
-            traceId = context.TraceIdentifier 
+            traceId = context.TraceIdentifier
         });
     }
 });
