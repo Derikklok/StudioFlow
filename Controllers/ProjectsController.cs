@@ -41,6 +41,12 @@ public class ProjectsController : ControllerBase
         return Ok(await _projectService.UpdateAsync(id, request));
     }
 
+    [HttpPatch("{id}")]
+    public async Task<ActionResult<ProjectResponse>> Patch(int id, PatchProjectRequest request)
+    {
+        return Ok(await _projectService.PatchAsync(id, request));
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

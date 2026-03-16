@@ -79,6 +79,20 @@ public class UpdateProjectRequest
 }
 ```
 
+#### PatchProjectRequest (`DTOs/Projects/PatchProjectRequest.cs`)
+Used for partial updates of existing projects - **all fields are optional**:
+```csharp
+public class PatchProjectRequest
+{
+    [MaxLength(255)] public string? Title { get; set; }
+    [MaxLength(255)] public string? ArtistName { get; set; }
+    [MaxLength(1000)] public string? Description { get; set; }
+    public DateTime? Deadline { get; set; }
+    public DateTime? TargetReleaseDate { get; set; }
+    public ProjectStatus? Status { get; set; }
+}
+```
+
 #### ProjectResponse (`DTOs/Projects/ProjectResponse.cs`)
 Response DTO containing all project data:
 ```csharp
@@ -153,7 +167,8 @@ REST API endpoints for project management:
 | POST | `/api/projects` | Create new project |
 | GET | `/api/projects` | Get all projects |
 | GET | `/api/projects/{id}` | Get project by ID |
-| PUT | `/api/projects/{id}` | Update project |
+| PUT | `/api/projects/{id}` | Update entire project |
+| PATCH | `/api/projects/{id}` | Partial update (new) |
 | DELETE | `/api/projects/{id}` | Delete project |
 
 ### 7. Exceptions
@@ -319,7 +334,37 @@ Content-Type: application/json
 }
 ```
 
-### 5. Delete Project
+### 5. Patch Project (Partial Update)
+**Request:**
+```http
+PATCH /api/projects/1
+Content-Type: application/json
+
+{
+    "status": "MIXING",
+    "description": "Now in mixing phase"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+    "id": 1,
+    "title": "Summer Album 2026 - Updated",
+    "artistName": "The Composers",
+    "description": "Now in mixing phase",
+    "deadline": "2026-06-30T00:00:00Z",
+    "targetReleaseDate": "2026-07-15T00:00:00Z",
+    "status": "MIXING",
+    "createdBy": 1,
+    "createdAt": "2026-03-16T10:30:00Z",
+    "updatedAt": "2026-03-16T12:00:00Z"
+}
+```
+
+**Note**: Only send the fields you want to update. Other fields are preserved automatically.
+
+### 6. Delete Project
 **Request:**
 ```http
 DELETE /api/projects/1

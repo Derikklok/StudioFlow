@@ -140,7 +140,78 @@ Content-Type: application/json
 
 ---
 
-### 5. Delete Project (DELETE)
+### 5. Patch Project (PATCH)
+
+**URL**: `http://localhost:5000/api/projects/1`
+
+**Method**: `PATCH`
+
+**Headers**:
+```
+Content-Type: application/json
+```
+
+**Request Body** (Update only status):
+```json
+{
+    "status": "RECORDING"
+}
+```
+
+**Expected Response (200 OK)**:
+```json
+{
+    "id": 1,
+    "title": "Summer Album 2026 - Updated",
+    "artistName": "The Composers",
+    "description": "Updated description - now recording!",
+    "deadline": "2026-06-30T00:00:00Z",
+    "targetReleaseDate": "2026-07-15T00:00:00Z",
+    "status": "RECORDING",
+    "createdBy": 1,
+    "createdAt": "2026-03-16T12:30:45.123456Z",
+    "updatedAt": "2026-03-16T12:45:30.654321Z"
+}
+```
+
+**Note**: PATCH allows partial updates. Only send the fields you want to change!
+
+---
+
+### 5b. Patch - Multiple Fields
+
+**URL**: `http://localhost:5000/api/projects/1`
+
+**Method**: `PATCH`
+
+**Request Body** (Update multiple specific fields):
+```json
+{
+    "title": "Summer Album 2026 - Final Mix",
+    "description": "Ready for final mixing phase",
+    "status": "MIXING"
+}
+```
+
+**Expected Response (200 OK)**:
+```json
+{
+    "id": 1,
+    "title": "Summer Album 2026 - Final Mix",
+    "artistName": "The Composers",
+    "description": "Ready for final mixing phase",
+    "deadline": "2026-06-30T00:00:00Z",
+    "targetReleaseDate": "2026-07-15T00:00:00Z",
+    "status": "MIXING",
+    "createdBy": 1,
+    "createdAt": "2026-03-16T12:30:45.123456Z",
+    "updatedAt": "2026-03-16T13:00:00.789012Z"
+}
+```
+
+---
+
+### 6. Delete Project (DELETE)
 
 **URL**: `http://localhost:5000/api/projects/1`
 

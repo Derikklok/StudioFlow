@@ -12,5 +12,7 @@ public interface IProjectService
 
     Task<ProjectResponse> UpdateAsync(int id, UpdateProjectRequest request);
 
+    Task<ProjectResponse> PatchAsync(int id, PatchProjectRequest request);
+
     Task DeleteAsync(int id);
 }

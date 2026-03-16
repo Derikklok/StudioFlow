@@ -72,6 +72,39 @@ public class ProjectService : IProjectService
         return Map(updated);
     }
 
+    public async Task<ProjectResponse> PatchAsync(int id, PatchProjectRequest request)
+    {
+        var project = await _projectRepository.GetByIdAsync(id);
+
+        if (project == null)
+            throw new ProjectNotFoundException(id);
+
+        // Only update fields that are provided (not null)
+        if (!string.IsNullOrEmpty(request.Title))
+            project.Title = request.Title;
+
+        if (!string.IsNullOrEmpty(request.ArtistName))
+            project.ArtistName = request.ArtistName;
+
+        if (request.Description != null)
+            project.Description = request.Description;
+
+        if (request.Deadline.HasValue)
+            project.Deadline = request.Deadline.Value;
+
+        if (request.TargetReleaseDate.HasValue)
+            project.TargetReleaseDate = request.TargetReleaseDate.Value;
+
+        if (request.Status.HasValue)
+            project.Status = request.Status.Value;
+
+        project.UpdatedAt = DateTime.UtcNow;
+
+        var updated = await _projectRepository.UpdateAsync(project);
+
+        return Map(updated);
+    }
+
     public async Task DeleteAsync(int id)
     {
         var project = await _projectRepository.GetByIdAsync(id);
