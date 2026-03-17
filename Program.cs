@@ -104,6 +104,26 @@ app.Use(async (context, next) =>
             error = ex.Message
         });
     }
+    catch (ClearanceNotFoundException ex)
+    {
+        context.Response.StatusCode = 404;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = ex.Message
+        });
+    }
+    catch (InvalidOperationException ex)
+    {
+        context.Response.StatusCode = 400;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = ex.Message
+        });
+    }
     catch (Exception ex)
     {
         // Log only unexpected errors with minimal info
@@ -134,3 +154,4 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+

@@ -33,8 +33,23 @@ public class ClearanceRepository : IClearanceRepository
         await _context.Clearances.AddAsync(clearance);
     }
 
+    public async Task UpdateAsync(Clearance clearance)
+    {
+        _context.Clearances.Update(clearance);
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var clearance = await GetByIdAsync(id);
+        if (clearance != null)
+        {
+            _context.Clearances.Remove(clearance);
+        }
+    }
+
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
     }
 }
+
