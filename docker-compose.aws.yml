@@ -1,0 +1,43 @@
+﻿version: '3.8'
+
+services:
+  # Note: AWS ECS doesn't use docker-compose directly for production
+  # This is for reference and local AWS simulation testing
+  # Use AWS CloudFormation or Terraform for production deployments
+
+  studioflow:
+    container_name: studioflow-api
+    image: ${ECR_REGISTRY}/studioflow:latest
+    restart: always
+    environment:
+      # Database Configuration (Use AWS RDS)
+      ConnectionStrings__DefaultConnection: "server=${DB_HOST};database=${DB_NAME};user=${DB_USER};password=${DB_PASSWORD}"
+      
+      # API Configuration
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:80
+      
+      # Logging
+      Logging__LogLevel__Default: Warning
+      Logging__LogLevel__Microsoft__AspNetCore: Warning
+    ports:
+      - "80:80"
+    volumes:
+      # AWS EBS volumes or EFS
+      - studioflow_logs:/app/logs
+    networks:
+      - studioflow-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health || exit 1"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+
+volumes:
+  studioflow_logs:
+    driver: local
+
+networks:
+  studioflow-network:
+    driver: bridge
+

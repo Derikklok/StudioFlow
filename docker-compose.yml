@@ -1,0 +1,73 @@
+﻿version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: studioflow-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-sachin1605}
+      MYSQL_DATABASE: ${DB_NAME:-studio_db}
+    ports:
+      - "3307:3306"
+    volumes:
+      # Named volume for persistent data
+      - mysql_data:/var/lib/mysql
+      # Initialization scripts (optional)
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - studioflow-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+  # StudioFlow API Service
+  studioflow:
+    container_name: studioflow-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      # Database Configuration
+      ConnectionStrings__DefaultConnection: "server=${DB_HOST:-mysql};port=3306;database=${DB_NAME:-studio_db};user=${DB_USER:-root};password=${DB_PASSWORD:-sachin1605}"
+      
+      # API Configuration
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS:-http://+:80}
+      
+      # Logging
+      Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
+      Logging__LogLevel__Microsoft__AspNetCore: Warning
+    ports:
+      - "${API_PORT:-5000}:80"
+      - "${API_HTTPS_PORT:-5001}:443"
+    volumes:
+      # Logs volume
+      - ./logs:/app/logs
+      # Optional: source code for development
+      - .:/src
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - studioflow-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health || exit 1"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+
+volumes:
+  # Named volume for MySQL data persistence
+  mysql_data:
+    driver: local
+
+networks:
+  # Custom network for inter-service communication
+  studioflow-network:
+    driver: bridge
+

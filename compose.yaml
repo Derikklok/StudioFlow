@@ -1,7 +1,0 @@
-﻿services:
-  studioflow:
-    image: studioflow
-    build:
-      context: .
-      dockerfile: Dockerfile
-
