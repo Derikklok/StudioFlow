@@ -1,0 +1,114 @@
+﻿version: '3.8'
+
+services:
+  # MySQL Database Service with Persistent Volume
+  mysql:
+    image: mysql:8.0
+    container_name: studioflow-mysql
+    restart: always
+    environment:
+      # Database credentials - override via .env file
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-sachin1605}
+      MYSQL_DATABASE: ${DB_NAME:-studio_db}
+      MYSQL_USER: ${DB_USER:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-sachin1605}
+      MYSQL_PORT: 3306
+      # MySQL Performance Tuning
+      MYSQL_LOWER_CASE_TABLE_NAMES: 1
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      # Named volume for persistent database data
+      - db_data:/var/lib/mysql
+      # Initialization scripts
+      - ./init-db:/docker-entrypoint-initdb.d
+      # Backup directory
+      - ./backups:/backups
+    networks:
+      - studioflow-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # StudioFlow API Service
+  studioflow:
+    image: ${DOCKER_HUB_USERNAME:-yourusername}/studioflow:${DOCKER_IMAGE_TAG:-latest}
+    container_name: studioflow-api
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Database Configuration
+      ConnectionStrings__DefaultConnection: "server=${DB_HOST:-mysql};database=${DB_NAME:-studio_db};user=${DB_USER:-root};password=${DB_PASSWORD:-sachin1605};port=3306;Allow User Variables=true"
+      
+      # ASP.NET Core Configuration
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:80;https://+:443
+      ASPNETCORE_HTTPS_PORT: 443
+      
+      # Logging Configuration
+      Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
+      Logging__LogLevel__Microsoft: Warning
+      Logging__LogLevel__Microsoft__AspNetCore: Warning
+      Logging__Console__IncludeScopes: "true"
+      
+      # Application Configuration
+      DOTNET_TieredCompilation: "true"
+      DOTNET_TC_QuickJitForLoops: "true"
+      
+    ports:
+      - "${API_PORT:-5000}:80"
+      - "${API_HTTPS_PORT:-5001}:443"
+    volumes:
+      # Application logs volume
+      - ./app-logs:/app/logs
+      # Optional: SSL certificates
+      # - ./certs:/app/certs:ro
+    networks:
+      - studioflow-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health" ]
+      timeout: 10s
+      retries: 3
+      interval: 30s
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Resource limits for production
+    # Uncomment for production deployments
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1'
+    #       memory: 512M
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 256M
+
+volumes:
+  # Named volume for MySQL data persistence
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./db-data
+
+networks:
+  studioflow-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
