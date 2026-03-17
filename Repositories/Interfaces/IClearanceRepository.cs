@@ -10,5 +10,9 @@ public interface IClearanceRepository
 
     Task AddAsync(Clearance clearance);
 
+    Task UpdateAsync(Clearance clearance);
+
+    Task DeleteAsync(int id);
+
     Task SaveChangesAsync();
 }

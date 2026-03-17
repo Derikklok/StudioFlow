@@ -1,4 +1,5 @@
 ﻿using StudioFlow.DTOs.Clearances;
+using StudioFlow.Exceptions;
 using StudioFlow.Models;
 using StudioFlow.Repositories.Interfaces;
 using StudioFlow.Services.Interfaces;
@@ -47,16 +48,58 @@ public class ClearanceService : IClearanceService
         return MapToDto(clearance);
     }
 
+    public async Task<ClearanceResponse> UpdateClearanceAsync(int id, UpdateClearanceDto dto)
+    {
+        var clearance = await _repository.GetByIdAsync(id);
+
+        if (clearance == null)
+            throw new ClearanceNotFoundException(id);
+
+        if (dto.RightsOwner != null)
+            clearance.RightsOwner = dto.RightsOwner;
+
+        if (dto.LicenseType != null)
+            clearance.LicenseType = dto.LicenseType;
+
+        if (dto.Notes != null)
+            clearance.Notes = dto.Notes;
+
+        if (dto.IsApproved.HasValue && dto.IsApproved.Value && !clearance.IsApproved)
+        {
+            clearance.IsApproved = true;
+            clearance.ApprovedAt = DateTime.UtcNow;
+        }
+
+        await _repository.UpdateAsync(clearance);
+        await _repository.SaveChangesAsync();
+
+        return MapToDto(clearance);
+    }
+
     public async Task ApproveClearanceAsync(int id)
     {
         var clearance = await _repository.GetByIdAsync(id);
 
         if (clearance == null)
-            throw new Exception("Clearance not found");
+            throw new ClearanceNotFoundException(id);
+
+        if (clearance.IsApproved)
+            throw new InvalidOperationException("Clearance is already approved.");
 
         clearance.IsApproved = true;
         clearance.ApprovedAt = DateTime.UtcNow;
 
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task DeleteClearanceAsync(int id)
+    {
+        var clearance = await _repository.GetByIdAsync(id);
+
+        if (clearance == null)
+            throw new ClearanceNotFoundException(id);
+
+        await _repository.DeleteAsync(id);
         await _repository.SaveChangesAsync();
     }
 
@@ -75,3 +118,4 @@ public class ClearanceService : IClearanceService
         };
     }
 }
+

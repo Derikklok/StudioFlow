@@ -10,5 +10,9 @@ public interface IClearanceService
 
     Task<ClearanceResponse?> GetByIdAsync(int id);
 
+    Task<ClearanceResponse> UpdateClearanceAsync(int id, UpdateClearanceDto dto);
+
     Task ApproveClearanceAsync(int id);
+
+    Task DeleteClearanceAsync(int id);
 }

@@ -1,0 +1,170 @@
+﻿{
+  "info": {
+    "name": "StudioFlow Clearance API",
+    "description": "Complete API collection for StudioFlow Clearance feature testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Clearances",
+      "item": [
+        {
+          "name": "1. Create Clearance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sampleId\": 1,\n  \"rightsOwner\": \"Artist Name\",\n  \"licenseType\": \"Creative Commons BY 4.0\",\n  \"notes\": \"Non-commercial use only\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/clearances",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "clearances"]
+            },
+            "description": "Create a new clearance record for a sample. Returns 201 Created with clearance details."
+          }
+        },
+        {
+          "name": "2. Get All Clearances",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/clearances",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "clearances"]
+            },
+            "description": "Retrieve all clearance records in the system."
+          }
+        },
+        {
+          "name": "3. Get Clearance by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/clearances/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "clearances", "1"]
+            },
+            "description": "Retrieve a specific clearance by its ID. Replace '1' with actual clearance ID."
+          }
+        },
+        {
+          "name": "4. Update Clearance (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"licenseType\": \"Updated License Type\",\n  \"notes\": \"Updated notes here\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/clearances/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "clearances", "1"]
+            },
+            "description": "Partially update a clearance. Only specified fields are updated. Replace '1' with actual clearance ID."
+          }
+        },
+        {
+          "name": "5. Approve Clearance",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/clearances/1/approve",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "clearances", "1", "approve"]
+            },
+            "description": "Approve a clearance. Sets isApproved=true and records approval timestamp. Replace '1' with actual clearance ID."
+          }
+        },
+        {
+          "name": "6. Approve Again (Should Fail)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/clearances/1/approve",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "clearances", "1", "approve"]
+            },
+            "description": "This will fail because clearance is already approved. Demonstrates error handling."
+          }
+        },
+        {
+          "name": "7. Delete Clearance",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/clearances/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "clearances", "1"]
+            },
+            "description": "Delete a clearance record. Returns 204 No Content. Replace '1' with actual clearance ID."
+          }
+        },
+        {
+          "name": "8. Get Deleted Clearance (Should Fail)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/clearances/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "clearances", "1"]
+            },
+            "description": "Get a deleted clearance. This will return 404 Not Found. Demonstrates error handling."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Complete Workflow",
+      "item": [
+        {
+          "name": "Full Test Workflow",
+          "description": "This folder demonstrates the complete workflow:\n1. Create a clearance\n2. Get it to verify\n3. Update it partially\n4. Approve it\n5. Try to approve again (expect error)\n6. Delete it\n7. Try to get it (expect 404)",
+          "item": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}
+
