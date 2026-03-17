@@ -9,14 +9,21 @@ namespace StudioFlow.Services;
 public class ClearanceService : IClearanceService
 {
     private readonly IClearanceRepository _repository;
+    private readonly ISampleRepository _sampleRepository;
 
-    public ClearanceService(IClearanceRepository repository)
+    public ClearanceService(IClearanceRepository repository, ISampleRepository sampleRepository)
     {
         _repository = repository;
+        _sampleRepository = sampleRepository;
     }
 
     public async Task<ClearanceResponse> CreateClearanceAsync(CreateClearanceDto dto)
     {
+        // Validate that the sample exists
+        var sample = await _sampleRepository.GetByIdAsync(dto.SampleId);
+        if (sample == null)
+            throw new SampleNotFoundException(dto.SampleId);
+
         var clearance = new Clearance
         {
             SampleId = dto.SampleId,
