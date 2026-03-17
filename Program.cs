@@ -23,6 +23,8 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ISampleRepository, SampleRepository>();
 builder.Services.AddScoped<ISampleService, SampleService>();
+builder.Services.AddScoped<IClearanceRepository, ClearanceRepository>();
+builder.Services.AddScoped<IClearanceService, ClearanceService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
